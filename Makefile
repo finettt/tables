@@ -4,7 +4,7 @@ OBJ_DIR = build
 BIN_DIR = build/bin
 OUTPUT = $(BIN_DIR)/tables
 
-OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/node.o $(OBJ_DIR)/token.o $(OBJ_DIR)/var.o
+OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/node.o $(OBJ_DIR)/token.o $(OBJ_DIR)/var.o $(OBJ_DIR)/math_token.o $(OBJ_DIR)/math_node.o
 
 all: tables
 
@@ -27,6 +27,14 @@ $(OBJ_DIR)/token.o: token.c token.h node.h
 $(OBJ_DIR)/var.o: var.c var.h
 	mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c var.c -o $(OBJ_DIR)/var.o
+
+$(OBJ_DIR)/math_token.o: engines/math/token.c engines/math/token.h engines/math/node.h
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CLFAGS) -c engines/math/token.c -o $(OBJ_DIR)/math_token.o
+
+$(OBJ_DIR)/math_node.o: engines/math/node.c engines/math/node.h
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CLFAGS) -c engines/math/node.c -o $(OBJ_DIR)/math_node.o
 
 clean:
 	rm -rf $(OBJ_DIR) *.o

@@ -1,16 +1,16 @@
-#ifndef TOKEN_H
-#define TOKEN_H
+#ifndef MATH_TOKEN_H
+#define MATH_TOKEN_H
 
 typedef enum {
-    TOKEN_NUMBER,
-    TOKEN_PLUS,
-    TOKEN_MINUS,
-    TOKEN_MUL,
-    TOKEN_DIV,
-    TOKEN_POW, 
-    TOKEN_LPAREN,
-    TOKEN_RPAREN,
-    TOKEN_EOF
+    MATH_TOKEN_NUMBER,
+    MATH_TOKEN_PLUS,
+    MATH_TOKEN_MINUS,
+    MATH_TOKEN_MUL,
+    MATH_TOKEN_DIV,
+    MATH_TOKEN_POW, 
+    MATH_TOKEN_LPAREN,
+    MATH_TOKEN_RPAREN,
+    MATH_TOKEN_EOF
 } MathTokenType;
 
 typedef struct {

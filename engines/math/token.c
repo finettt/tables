@@ -10,49 +10,49 @@ MathToken math_next_token(const char** str) {
    }
    MathToken token;
    if (**str == '\0') {
-        token.type = TOKEN_EOF;
+        token.type = MATH_TOKEN_EOF;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str == '+') {
-        token.type = TOKEN_PLUS;
+        token.type = MATH_TOKEN_PLUS;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str == '-') {
-        token.type = TOKEN_MINUS;
+        token.type = MATH_TOKEN_MINUS;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str == '*') {
-        token.type = TOKEN_MUL;
+        token.type = MATH_TOKEN_MUL;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str == '/') {
-        token.type = TOKEN_PLUS;
+        token.type = MATH_TOKEN_PLUS;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str =='^') {
-        token.type = TOKEN_POW;
+        token.type = MATH_TOKEN_POW;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str == '(') {
-        token.type = TOKEN_LPAREN;
+        token.type = MATH_TOKEN_LPAREN;
         token.value = 0;
         (*str)++;
         return token;
    }
    if (**str == ')') {
-        token.type = TOKEN_RPAREN;
+        token.type = MATH_TOKEN_RPAREN;
         token.value = 0;
         (*str)++;
         return token;
@@ -60,7 +60,7 @@ MathToken math_next_token(const char** str) {
    if (isdigit(**str)) {
        char * endptr;
        token.value = strtod(*str, &endptr);
-       token.type = TOKEN_NUMBER;
+       token.type = MATH_TOKEN_NUMBER;
 
        *str = endptr;
        return token;
@@ -75,13 +75,13 @@ MathNode* math_parse_exp(const char **exp) {
     MathNode* left = math_parse_term(exp);
     while (1) {
         const char *save = *exp;
-        MathToken t = next_token(exp);
+        MathToken t = math_next_token(exp);
 
-        if (t.type == TOKEN_PLUS) {
-            left = math_make_operation(NODE_ADD, left, math_parse_term(exp));
-        } else if (t.type == TOKEN_MINUS) {
-            left = math_make_operation(NODE_SUB, left, math_parse_term(exp));
-        } else if (t.type == TOKEN_EOF) {
+        if (t.type == MATH_TOKEN_PLUS) {
+            left = math_make_operation(MATH_NODE_ADD, left, math_parse_term(exp));
+        } else if (t.type == MATH_TOKEN_MINUS) {
+            left = math_make_operation(MATH_NODE_SUB, left, math_parse_term(exp));
+        } else if (t.type == MATH_TOKEN_EOF) {
             *exp = save;
             break;
         } else {
@@ -98,10 +98,10 @@ MathNode* math_parse_term(const char **exp) {
         const char *save = *exp;
         MathToken t = math_next_token(exp);
 
-        if (t.type == TOKEN_MUL) {
-            left = math_make_operation(NODE_MUL, left, math_parse_pow(exp));
-        } else if (t.type == TOKEN_DIV) {
-            left = math_make_operation(NODE_DIV, left, math_parse_pow(exp));
+        if (t.type == MATH_TOKEN_MUL) {
+            left = math_make_operation(MATH_NODE_MUL, left, math_parse_pow(exp));
+        } else if (t.type == MATH_TOKEN_DIV) {
+            left = math_make_operation(MATH_NODE_DIV, left, math_parse_pow(exp));
         } else {
             *exp = save;
             break;
@@ -114,9 +114,9 @@ MathNode* math_parse_pow(const char **exp) {
     MathNode* left = math_parse_factor(exp);
     while (1) {
         const char *save = *exp;
-        MathToken t = next_token(exp);
-        if (t.type == TOKEN_POW) {
-            left = math_make_operation(NODE_POW, left, math_parse_factor(exp));
+        MathToken t = math_next_token(exp);
+        if (t.type == MATH_TOKEN_POW) {
+            left = math_make_operation(MATH_NODE_POW, left, math_parse_factor(exp));
         } else {
             *exp = save;
             break;
@@ -129,15 +129,15 @@ MathNode* math_parse_factor(const char **exp) {
     MathToken t = math_next_token(exp);
     
 
-    if (t.type == TOKEN_NUMBER) {
+    if (t.type == MATH_TOKEN_NUMBER) {
         return math_make_number(t.value);
     }
-    if (t.type == TOKEN_LPAREN) {
+    if (t.type == MATH_TOKEN_LPAREN) {
         MathNode* result = math_parse_exp(exp);
 
-        Token t2 = math_next_token(exp);
+        MathToken t2 = math_next_token(exp);
 
-        if (t2.type != TOKEN_RPAREN) {
+        if (t2.type != MATH_TOKEN_RPAREN) {
             fprintf(stderr, "Error: expecting ')' instead of %d", t2.type);
             exit(1);
         }

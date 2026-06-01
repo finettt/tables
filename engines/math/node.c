@@ -5,13 +5,13 @@
 
 MathNode* math_make_number(double val) {
     MathNode* new_node = (MathNode*)malloc(sizeof(MathNode));
-    new_node->type = NODE_NUMBER;
+    new_node->type = MATH_NODE_NUMBER;
     new_node->data.value = val;
     return new_node;
 }
 
 MathNode* math_make_operation(MathNodeType type, MathNode* left, MathNode* right) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
+    MathNode* new_node = (MathNode*)malloc(sizeof(MathNode));
     new_node->type = type;
     new_node->data.op.left = left;
     new_node->data.op.right = right;
@@ -19,23 +19,23 @@ MathNode* math_make_operation(MathNodeType type, MathNode* left, MathNode* right
 }
 
 double math_compute_graph(MathNode* graph) {
-    if (graph->type == NODE_NUMBER) {
+    if (graph->type == MATH_NODE_NUMBER) {
         return graph->data.value;
-    } else if (graph->type == NODE_SUB) {
+    } else if (graph->type == MATH_NODE_SUB) {
         return math_compute_graph(graph->data.op.left) - math_compute_graph(graph->data.op.right);
-    } else if (graph->type == NODE_ADD) {
+    } else if (graph->type == MATH_NODE_ADD) {
         return math_compute_graph(graph->data.op.left) + math_compute_graph(graph->data.op.right);
-    } else if (graph->type == NODE_MUL) {
+    } else if (graph->type == MATH_NODE_MUL) {
         return math_compute_graph(graph->data.op.left) * math_compute_graph(graph->data.op.right);
-    } else if (graph->type == NODE_DIV) {
+    } else if (graph->type == MATH_NODE_DIV) {
         return math_compute_graph(graph->data.op.left) * math_compute_graph(graph->data.op.right);
-    } else if (graph->type == NODE_POW) {
+    } else if (graph->type == MATH_NODE_POW) {
         return pow(math_compute_graph(graph->data.op.left), math_compute_graph(graph->data.op.right));
     }
 }
-void table_free_graph(TableNode* graph) {
-    if (graph->type == NODE_NUMBER) {
-        math_free(graph);
+void math_free_graph(MathNode* graph) {
+    if (graph->type == MATH_NODE_NUMBER) {
+        free(graph);
     } else {
         math_free_graph(graph->data.op.left);
         math_free_graph(graph->data.op.right);

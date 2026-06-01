@@ -5,9 +5,13 @@
 #include <stddef.h>
 #include "token.h"
 #include "node.h"
+#include "engines/math/node.h"
+#include "engines/math/token.h"
+
 const char VIEW_OP[4] = "VIEW";
 const char EQ_OP[2] = "EQ";
 const char GET_OP[3] = "GET";
+const char MATH_OP[4] = "MATH";
 
 TableToken table_next_token(const char **exp) {
     while (**exp == ' ' || **exp == '\t' || **exp == '\r' || **exp == '\n')
@@ -36,6 +40,12 @@ TableToken table_next_token(const char **exp) {
         token.type = TOKEN_GET;
         token.value = 0;
         *exp += 3;
+        return token;
+    }
+    if (strncmp(*exp, MATH_OP, sizeof(MATH_OP)) == 0 && !isalnum((*exp)[sizeof(MATH_OP)])){
+        token.type = TOKEN_MATH;
+        token.value = 0;
+        *exp += 4;
         return token;
     }
     if (isdigit(**exp) || (**exp == '.' && isdigit((*exp)[1]))) {
@@ -98,7 +108,6 @@ TableNode* table_parse_factor(const char **exp) {
             return table_make_var(t.name);
         }
         if(t.type == TOKEN_GET) {
-            const char* save = *exp;
             TableToken t2 = table_next_token(exp);
             if (t2.type == TOKEN_VAR) {
                 double value = table_get_variable(t2.name);
@@ -106,6 +115,12 @@ TableNode* table_parse_factor(const char **exp) {
             }
             fprintf(stderr, "Error: Expected variable after GET");
             exit(1);
+        }
+        if(t.type == TOKEN_MATH) {
+            MathNode* parsed_math = math_parse_exp(exp);
+            double result = math_compute_graph(parsed_math);
+            math_free_graph(parsed_math);
+            return table_make_number(result); 
         }
         if (t.type == TOKEN_NUMBER) {
             return table_make_number(t.value);

@@ -7,7 +7,7 @@
 int main() {
     printf("Hello, world!\n");
 
-    const char* code = "x EQ 1";
+    const char* code = "x EQ MATH 1+1";
     const char* ptr = code;
     
     TableNode* parsed_code = table_parse_exp(&ptr);
