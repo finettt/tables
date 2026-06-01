@@ -1,24 +1,33 @@
 CC = cc
 CFLAGS = -g -Wall
-OUTPUT = build/
+OBJ_DIR = build
+BIN_DIR = build/bin
+OUTPUT = $(BIN_DIR)/tables
+
+OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/node.o $(OBJ_DIR)/token.o $(OBJ_DIR)/var.o
 
 all: tables
 
+tables: $(OBJS)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $(OUTPUT) $(OBJS) -lm
 
- tables: main.o node.o token.o var.o
-	mkdir -p $(OUTPUT)bin/
-	cd $(OUTPUT)
-	$(CC) $(CFLAGS) -lm -o $(OUTPUT)bin/tables $(OUTPUT)main.o $(OUTPUT)node.o $(OUTPUT)token.o $(OUTPUT)var.o
+$(OBJ_DIR)/main.o: main.c node.h token.h
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c main.c -o $(OBJ_DIR)/main.o
 
+$(OBJ_DIR)/node.o: node.c var.h
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c node.c -o $(OBJ_DIR)/node.o
 
-$(OUTPUT)main.o: main.c node.h token.h
-	$(CC) $(CFLAGS) -c main.c -o $(OUTPUT)main.o
+$(OBJ_DIR)/token.o: token.c token.h node.h
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c token.c -o $(OBJ_DIR)/token.o
 
-$(OUTPUT)node.o: node.c var.h
-	$(CC) $(CFLAGS) -c node.c -o $(OUTPUT)node.o
+$(OBJ_DIR)/var.o: var.c var.h
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c var.c -o $(OBJ_DIR)/var.o
 
-$(OUTPUT)token.o: token.c token.h node.h
-	$(CC) $(CFLAGS) -c token.c -o $(OUTPUT)token.o
+clean:
+	rm -rf $(OBJ_DIR) *.o
 
-$(OUTPUT)var.o: var.c var.h
-	$(CC) $(CFLAGS) -c var.c -o $(OUTPUT)var.o
