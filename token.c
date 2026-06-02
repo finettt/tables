@@ -8,10 +8,10 @@
 #include "engines/math/node.h"
 #include "engines/math/token.h"
 
-#define VIEW_OP "VIEW"
-#define EQ_OP   "EQ"
-#define GET_OP  "GET"
-#define MATH_OP "MATH"
+static const char VIEW_OP[] = "VIEW";
+static const char EQ_OP[] = "EQ";
+static const char GET_OP[] = "GET";
+static const char MATH_OP[] = "MATH";
 
 TableToken table_next_token(const char **exp) {
     while (**exp == ' ' || **exp == '\t' || **exp == '\r' || **exp == '\n')
@@ -24,25 +24,25 @@ TableToken table_next_token(const char **exp) {
         token.value = 0;
         return token;
     }
-    if (strncmp(*exp, VIEW_OP, sizeof(VIEW_OP)) == 0 && !isalnum((*exp)[sizeof(VIEW_OP)])) {
+    if (strncmp(*exp, VIEW_OP, sizeof(VIEW_OP)-1) == 0) { 
         token.type = TOKEN_VIEW;
         token.value = 0;
         *exp += 4;
         return token;
     }
-    if (strncmp(*exp, EQ_OP, sizeof(EQ_OP)) == 0 && !isalnum((*exp)[sizeof(EQ_OP)])) {
+    if (strncmp(*exp, EQ_OP, sizeof(EQ_OP)-1) == 0) { 
         token.type = TOKEN_EQ;
         token.value = 0;
         *exp += 2;
         return token;
     }
-    if (strncmp(*exp, GET_OP, sizeof(GET_OP)) == 0 && !isalnum((*exp)[sizeof(GET_OP)])) {
+    if (strncmp(*exp, GET_OP, sizeof(GET_OP)-1) == 0) { 
         token.type = TOKEN_GET;
         token.value = 0;
         *exp += 3;
         return token;
     }
-    if (strncmp(*exp, MATH_OP, sizeof(MATH_OP)) == 0 && !isalnum((*exp)[sizeof(MATH_OP)])){
+    if (strncmp(*exp, MATH_OP, sizeof(MATH_OP)-1) == 0) { 
         token.type = TOKEN_MATH;
         token.value = 0;
         *exp += 4;
@@ -84,6 +84,7 @@ TableNode* table_parse_exp(const char **exp) {
     while (1) {
         const char *save = *exp;
         TableToken t = table_next_token(exp);
+        
         if (t.type == TOKEN_EQ) {
             TableNode* factor = table_parse_factor(exp);
             switch (factor->type) {
@@ -95,6 +96,10 @@ TableNode* table_parse_exp(const char **exp) {
             }
             left = table_make_assign(left->data.name, factor->data.value);
             return left;
+        } 
+        if(t.type == TOKEN_EOF) {
+            *exp = save;
+            break;
         } else {
             *exp = save;
             break;

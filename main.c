@@ -13,7 +13,7 @@ int main() {
     TableNode* parsed_code = table_parse_exp(&ptr);
     table_compute_graph(parsed_code);
 
-    const char* code2 = "a EQ GET x";
+    const char* code2 = "a EQ MATH GET x+ 1";
     const char* ptr2 = code2;
     
     parsed_code = table_parse_exp(&ptr2);

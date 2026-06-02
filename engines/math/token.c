@@ -8,7 +8,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#define GET_OP "GET"
+static const char GET_OP[] = "GET";
 
 MathToken math_next_token(const char** str) {
    while (**str == ' ' || **str == '\t' || **str == '\n' || **str == '\r') {

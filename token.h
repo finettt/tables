@@ -1,9 +1,6 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 #include "node.h"
-extern const char VIEW_OP[]; 
-extern const char EQ_OP[];
-extern const char GET_OP[]; 
 typedef enum {
     TOKEN_VAR,
     TOKEN_EQ,
