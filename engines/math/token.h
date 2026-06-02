@@ -1,5 +1,6 @@
 #ifndef MATH_TOKEN_H
 #define MATH_TOKEN_H
+#include "../../var.h"
 
 typedef enum {
     MATH_TOKEN_NUMBER,
@@ -10,11 +11,14 @@ typedef enum {
     MATH_TOKEN_POW, 
     MATH_TOKEN_LPAREN,
     MATH_TOKEN_RPAREN,
+    MATH_TOKEN_VAR,
+    MATH_TOKEN_GET,
     MATH_TOKEN_EOF
 } MathTokenType;
 
 typedef struct {
     MathTokenType type;
+    char* name;
     double value; // specified only if type == TOKEN_NUMBER
 } MathToken;
 MathToken math_next_token(const char** str);

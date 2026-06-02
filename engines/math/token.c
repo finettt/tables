@@ -2,7 +2,13 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "node.h"
+#include "../../token.h"
+#include "../../node.h"
 #include "token.h"
+#include <stddef.h>
+#include <string.h>
+
+#define GET_OP "GET"
 
 MathToken math_next_token(const char** str) {
    while (**str == ' ' || **str == '\t' || **str == '\n' || **str == '\r') {
@@ -65,7 +71,31 @@ MathToken math_next_token(const char** str) {
        *str = endptr;
        return token;
    }
+   if (strncmp(*str, GET_OP, sizeof(GET_OP)) == 0 && !isalnum((*str)[sizeof(GET_OP)])) {
+        token.type = MATH_TOKEN_GET;
+        token.value = 0;
+        *str += 3;
+        return token;
+   }
+   if (isalpha(**str) || **str == '_'){
+        token.type = MATH_TOKEN_VAR;
+        token.value = 0;
+        char* start = *str;
+        while (isalnum(**str) || **str == '_') {
+            (*str)++;
+        }
+        ptrdiff_t length = *str - start;
 
+        char* var_name = (char*)malloc((length + 1) * sizeof(char));
+        if (var_name == NULL){
+            fprintf(stderr, "Error while allocating memory");
+            exit(1);
+        }
+        strncpy(var_name, start, length);
+        var_name[length] = '\0';
+        token.name = var_name;
+        return token;
+   }
    fprintf(stderr, "Error");
    exit(1);
 
@@ -131,6 +161,15 @@ MathNode* math_parse_factor(const char **exp) {
 
     if (t.type == MATH_TOKEN_NUMBER) {
         return math_make_number(t.value);
+    }
+    if(t.type == MATH_TOKEN_GET) {
+            TableToken t2 = table_next_token(exp);
+            if (t2.type == MATH_TOKEN_VAR) {
+                double value = table_get_variable(t2.name);
+                return math_make_number(value);
+            }
+            fprintf(stderr, "Error: Expected variable after GET");
+            exit(1);
     }
     if (t.type == MATH_TOKEN_LPAREN) {
         MathNode* result = math_parse_exp(exp);
