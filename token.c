@@ -8,10 +8,10 @@
 #include "engines/math/node.h"
 #include "engines/math/token.h"
 
-const char VIEW_OP[4] = "VIEW";
-const char EQ_OP[2] = "EQ";
-const char GET_OP[3] = "GET";
-const char MATH_OP[4] = "MATH";
+const char VIEW_OP[] = "VIEW";
+const char EQ_OP[] = "EQ";
+const char GET_OP[] = "GET";
+const char MATH_OP[] = "MATH";
 
 TableToken table_next_token(const char **exp) {
     while (**exp == ' ' || **exp == '\t' || **exp == '\r' || **exp == '\n')
