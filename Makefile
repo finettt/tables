@@ -30,11 +30,11 @@ $(OBJ_DIR)/var.o: var.c var.h
 
 $(OBJ_DIR)/math_token.o: engines/math/token.c engines/math/token.h engines/math/node.h
 	mkdir -p $(OBJ_DIR)
-	$(CC) $(CLFAGS) -c engines/math/token.c -o $(OBJ_DIR)/math_token.o
+	$(CC) $(CFLAGS) -c engines/math/token.c -o $(OBJ_DIR)/math_token.o
 
 $(OBJ_DIR)/math_node.o: engines/math/node.c engines/math/node.h
 	mkdir -p $(OBJ_DIR)
-	$(CC) $(CLFAGS) -c engines/math/node.c -o $(OBJ_DIR)/math_node.o
+	$(CC) $(CFLAGS) -c engines/math/node.c -o $(OBJ_DIR)/math_node.o
 
 clean:
 	rm -rf $(OBJ_DIR) *.o

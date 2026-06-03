@@ -40,7 +40,7 @@ MathToken math_next_token(const char** str) {
         return token;
    }
    if (**str == '/') {
-        token.type = MATH_TOKEN_PLUS;
+        token.type = MATH_TOKEN_DIV;
         token.value = 0;
         (*str)++;
         return token;
@@ -71,7 +71,7 @@ MathToken math_next_token(const char** str) {
        *str = endptr;
        return token;
    }
-   if (strncmp(*str, GET_OP, sizeof(GET_OP)) == 0 && !isalnum((*str)[sizeof(GET_OP)])) {
+   if (strncmp(*str, GET_OP, sizeof(GET_OP)-1) == 0 && !isalnum((*str)[sizeof(GET_OP)-1])) {
         token.type = MATH_TOKEN_GET;
         token.value = 0;
         *str += 3;
@@ -163,7 +163,7 @@ MathNode* math_parse_factor(const char **exp) {
         return math_make_number(t.value);
     }
     if(t.type == MATH_TOKEN_GET) {
-            TableToken t2 = table_next_token(exp);
+            MathToken t2 = math_next_token(exp);
             if (t2.type == MATH_TOKEN_VAR) {
                 double value = table_get_variable(t2.name);
                 return math_make_number(value);
