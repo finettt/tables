@@ -28,7 +28,7 @@ double math_compute_graph(MathNode* graph) {
     } else if (graph->type == MATH_NODE_MUL) {
         return math_compute_graph(graph->data.op.left) * math_compute_graph(graph->data.op.right);
     } else if (graph->type == MATH_NODE_DIV) {
-        return math_compute_graph(graph->data.op.left) * math_compute_graph(graph->data.op.right);
+        return math_compute_graph(graph->data.op.left) / math_compute_graph(graph->data.op.right);
     } else if (graph->type == MATH_NODE_POW) {
         return pow(math_compute_graph(graph->data.op.left), math_compute_graph(graph->data.op.right));
     }
