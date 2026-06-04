@@ -4,6 +4,7 @@
 #include "node.h"
 #include "../../token.h"
 #include "../../node.h"
+#include "../../shared/utils.h"
 #include "token.h"
 #include <stddef.h>
 #include <string.h>
@@ -80,6 +81,9 @@ MathToken math_next_token(const char** str) {
    if (isalpha(**str) || **str == '_'){
         token.type = MATH_TOKEN_VAR;
         token.value = 0;
+        token.index_count = 0;
+        token.indices[0] = 0;
+        token.indices[1] = 0;
         char* start = *str;
         while (isalnum(**str) || **str == '_') {
             (*str)++;
@@ -94,6 +98,24 @@ MathToken math_next_token(const char** str) {
         strncpy(var_name, start, length);
         var_name[length] = '\0';
         token.name = var_name;
+
+        const char *suffix_start = *str;
+        int seg = 0;
+        while (**str == '$' && seg < 2) {
+            (*str)++;
+            while (isdigit(**str)) (*str)++;
+            seg++;
+        }
+        if (*suffix_start == '$') {
+            ptrdiff_t slen = *str - suffix_start;
+            char *suffix_buf = (char*)malloc(slen + 1);
+            if (!suffix_buf) { fprintf(stderr, "Error: malloc failed\n"); exit(1); }
+            strncpy(suffix_buf, suffix_start, slen);
+            suffix_buf[slen] = '\0';
+            token.index_count = parse_indices(suffix_buf, token.indices);
+            free(suffix_buf);
+        }
+
         return token;
    }
    fprintf(stderr, "Error");
@@ -165,7 +187,7 @@ MathNode* math_parse_factor(const char **exp) {
     if(t.type == MATH_TOKEN_GET) {
             MathToken t2 = math_next_token(exp);
             if (t2.type == MATH_TOKEN_VAR) {
-                double value = table_get_variable(t2.name);
+                double value = table_get_variable(t2.name, t2.indices, t2.index_count);
                 return math_make_number(value);
             }
             fprintf(stderr, "Error: Expected variable after GET");

@@ -15,6 +15,8 @@ typedef struct {
     TableTokenType type;
     double value;
     char* name;
+    int indices[2];
+    int index_count;
 } TableToken;
 
 TableToken table_next_token(const char **exp);

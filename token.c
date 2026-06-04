@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include "token.h"
 #include "node.h"
+#include "shared/utils.h"
 #include "engines/math/node.h"
 #include "engines/math/token.h"
 
@@ -59,6 +60,9 @@ TableToken table_next_token(const char **exp) {
     if (isalpha(**exp) || **exp == '_'){
         token.type = TOKEN_VAR;
         token.value = 0;
+        token.index_count = 0;
+        token.indices[0] = 0;
+        token.indices[1] = 0;
         char* start = *exp;
         while (isalnum(**exp) || **exp == '_') {
             (*exp)++;
@@ -73,6 +77,24 @@ TableToken table_next_token(const char **exp) {
         strncpy(var_name, start, length);
         var_name[length] = '\0';
         token.name = var_name;
+
+        const char *suffix_start = *exp;
+        int seg = 0;
+        while (**exp == '$' && seg < 2) {
+            (*exp)++;
+            while (isdigit(**exp)) (*exp)++;
+            seg++;
+        }
+        if (*suffix_start == '$') {
+            ptrdiff_t slen = *exp - suffix_start;
+            char *suffix_buf = (char*)malloc(slen + 1);
+            if (!suffix_buf) { fprintf(stderr, "Error: malloc failed\n"); exit(1); }
+            strncpy(suffix_buf, suffix_start, slen);
+            suffix_buf[slen] = '\0';
+            token.index_count = parse_indices(suffix_buf, token.indices);
+            free(suffix_buf);
+        }
+
         return token;
     } 
     fprintf(stderr, "Unexpected character: %c\n", **exp);
@@ -94,7 +116,7 @@ TableNode* table_parse_exp(const char **exp) {
                     fprintf(stderr, "Expected a number or variable after EQ token");
                     exit(1);
             }
-            left = table_make_assign(left->data.name, factor->data.value);
+            left = table_make_assign(left->data.var.name, left->data.var.indices, left->data.var.index_count, factor->data.value);
             return left;
         } 
         if(t.type == TOKEN_EOF) {
@@ -110,12 +132,12 @@ TableNode* table_parse_exp(const char **exp) {
 TableNode* table_parse_factor(const char **exp) {
         TableToken t = table_next_token(exp);
         if (t.type == TOKEN_VAR) {
-            return table_make_var(t.name);
+            return table_make_var(t.name, t.indices, t.index_count);
         }
         if(t.type == TOKEN_GET) {
             TableToken t2 = table_next_token(exp);
             if (t2.type == TOKEN_VAR) {
-                double value = table_get_variable(t2.name);
+                double value = table_get_variable(t2.name, t2.indices, t2.index_count);
                 return table_make_number(value);
             }
             fprintf(stderr, "Error: Expected variable after GET");

@@ -19,7 +19,9 @@ typedef enum {
 typedef struct {
     MathTokenType type;
     char* name;
-    double value; // specified only if type == TOKEN_NUMBER
+    double value;
+    int indices[2];
+    int index_count;
 } MathToken;
 MathToken math_next_token(const char** str);
 MathNode* math_parse_exp(const char **exp);
